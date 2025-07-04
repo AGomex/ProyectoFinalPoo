@@ -1,10 +1,14 @@
 from django.urls import path
 
-from applications.doctor.views.atencion_medica import AtencionListView, AtencionCreateView, AtencionUpdateView, \
-    AtencionDeleteView
+from applications.doctor.views.atencion_medica import AtencionListView, AtencionCreateView, AtencionUpdateView,AtencionDeleteView
 from applications.doctor.views.servicioadicional import ServicioAdicionalesListView, ServicioAdicionalesCreateView, ServicioAdicionalesUpdateView, ServicioAdicionalesDeleteView
-from applications.doctor.views.horarioatencion import HorarioAtencionListView, HorarioAtencionCreateView, \
-    HorarioAtencionUpdateView, HorarioAtencionDeleteView
+from applications.doctor.views.horarioatencion import HorarioAtencionListView, HorarioAtencionCreateView, HorarioAtencionUpdateView, HorarioAtencionDeleteView
+from applications.doctor.views.pago import PagoListView, PagoCreateView, PagoUpdateView, PagoDeleteView
+from applications.doctor.views.detallepago import PagoDetailView
+from applications.doctor.views.citamedica import CitaMedicaCreateView, CitaMedicaDeleteView, CitaMedicaListView, CitaMedicaUpdateView, api_citas_medicas, api_dias_disponibles, api_horarios_detalle
+
+
+
 
 app_name='doctor' # define un espacio de nombre para la aplicacion
 urlpatterns = [
@@ -20,10 +24,27 @@ urlpatterns = [
     path('serviciosadicionales_update/<int:pk>/', ServicioAdicionalesUpdateView.as_view(), name="serviciosadicionales_update"),
     path('serviciosadicionales_delete/<int:pk>/', ServicioAdicionalesDeleteView.as_view(), name="serviciosadicionales_delete"),
 
+    # Rutas para Pago
+    path('pagos_list/', PagoListView.as_view(), name="pagos_list"),
+    path('pagos_create/', PagoCreateView.as_view(), name="pagos_create"),
+    path('pagos_update/<int:pk>/', PagoUpdateView.as_view(), name="pagos_update"),
+    path('pagos_delete/<int:pk>/', PagoDeleteView.as_view(), name="pagos_delete"),
+    path('pagos_detail/<int:pk>/', PagoDetailView.as_view(), name='pagos_detail'),
+
+
     # Rutas para Horario de Atencion
     path('horarioatenciones_list/', HorarioAtencionListView.as_view(), name="horarioatenciones_list"),
     path('horarioatenciones_create/', HorarioAtencionCreateView.as_view(), name="horarioatenciones_create"),
     path('horarioatenciones_update/<int:pk>/', HorarioAtencionUpdateView.as_view(), name="horarioatenciones_update"),
     path('horarioatenciones_delete/<int:pk>/', HorarioAtencionDeleteView.as_view(), name="horarioatenciones_delete"),
+    
+    # Rutas para CitaMedica
+    path('citamedicas_api_dias_disponibles/', api_dias_disponibles, name="citamedicas_api_dias_disponibles"),
+    path('api/horarios-detalle/', api_horarios_detalle, name='api_horarios_detalle'),
+    path('citamedicas_api/', api_citas_medicas, name="citamedicas_api"),
+    path('citamedicas_list/', CitaMedicaListView.as_view(), name="citamedicas_list"),
+    path('citamedicas_create/', CitaMedicaCreateView.as_view(), name="citamedicas_create"),
+    path('citamedicas_update/<int:pk>/', CitaMedicaUpdateView.as_view(), name="citamedicas_update"),
+    path('citamedicas_delete/<int:pk>/', CitaMedicaDeleteView.as_view(), name="citamedicas_delete"),    
 
 ]

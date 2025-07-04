@@ -27,4 +27,5 @@ urlpatterns = [
     path('core/', include('applications.core.urls', namespace='core')),
     path('doctor/', include('applications.doctor.urls', namespace='doctor')),
     path("__reload__/", include("django_browser_reload.urls")),
+    path('chatbot/', include(('chatbot.urls', 'chatbot'), namespace='chatbot')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

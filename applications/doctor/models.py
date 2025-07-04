@@ -5,7 +5,7 @@ from django.db import models
 from applications.doctor.utils.cita_medica import EstadoCitaChoices
 from applications.doctor.utils.doctor import DiaSemanaChoices
 from applications.doctor.utils.pago import MetodoPagoChoices, EstadoPagoChoices
-
+from datetime import datetime, time, timedelta
 """
     Modelo Patient: Representa los pacientes registrados en el sistema médico.
 """
@@ -30,10 +30,31 @@ class HorarioAtencion(models.Model):
         verbose_name = "Horario de Atención"
         verbose_name_plural = "Horarios de Atención"
 
+def generar_horas_validas():
+    hora_actual = datetime.strptime("07:00", "%H:%M")
+    fin = datetime.strptime("17:00", "%H:%M")
+    intervalo = timedelta(minutes=30)
+    horas = []
+
+    while hora_actual < fin:
+        if not (hora_actual.time() >= time(12, 0) and hora_actual.time() < time(13, 0)):
+            hora_str = hora_actual.strftime("%H:%M")
+            horas.append((hora_str, hora_str))
+        hora_actual += intervalo
+
+    return horas
+
+HORAS_CITA_CHOICES = generar_horas_validas()
+
+
 class CitaMedica(models.Model):
     paciente = models.ForeignKey('core.Paciente', on_delete=models.CASCADE, verbose_name="Paciente", related_name="citas")
     fecha = models.DateField(verbose_name="Fecha de la Cita")
-    hora_cita = models.TimeField(verbose_name="Hora de la Cita")
+    hora_cita = models.CharField(
+        max_length=5,
+        choices=HORAS_CITA_CHOICES,
+        verbose_name="Hora de la Cita"
+    )
 
     estado = models.CharField(
         max_length=10,

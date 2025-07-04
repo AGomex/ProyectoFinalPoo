@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from applications.security.components.mixin_crud import CreateViewMixin, DeleteViewMixin, ListViewMixin, PermissionMixin, UpdateViewMixin
 from applications.doctor.models import HorarioAtencion
@@ -22,7 +23,7 @@ class HorarioAtencionListView(PermissionMixin, ListViewMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['create_url'] = reverse_lazy('doctor:horarioatenciones_create')
-        print(context['permissions'])
+        context['mostrar_boton'] = not HorarioAtencion.objects.exists()  # Solo mostrar si no hay registros
         return context
 
 class HorarioAtencionCreateView(PermissionMixin, CreateViewMixin, CreateView):
@@ -31,6 +32,13 @@ class HorarioAtencionCreateView(PermissionMixin, CreateViewMixin, CreateView):
     form_class = HorarioAtencionForm
     success_url = reverse_lazy('doctor:horarioatenciones_list')
     permission_required = 'add_horarioatencion'
+
+    def dispatch(self, request, *args, **kwargs):
+        # Bloquear creación si ya existe un horario
+        if HorarioAtencion.objects.exists():
+            messages.warning(self.request, "Ya existe un horario registrado. No puede crear otro.")
+            return HttpResponseRedirect(self.success_url)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()

@@ -1,41 +1,31 @@
-{% extends 'home.html' %} 
+{% extends 'base.html' %} 
 <title>{% block title %}{{title}}{% endblock %}</title>
 {% load static %}
 {% block content %}
-<section class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 py-12">
-    <div class="container mx-auto px-4">
-        <!-- Header con título mejorado -->
-        <div class="text-center mb-12" data-aos="fade-down" data-aos-delay="100">
-            <div class="inline-block relative">
-                <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-                    {{ title1 }}
-                </h1>
-                <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
-            </div>
-            <p class="text-gray-600 dark:text-gray-300 mt-6 text-lg">Configura los horarios de atención médica</p>
+<section class="dark:bg-principal">
+    <div class="text-center" data-aos="fade" data-aos-delay="200">
+        <div class="sm:pt-28 lg:pt-4">
+            <h1 class="rounded-2xl bg-indigo-500 px-2 py-1 text-white uppercase text-4xl">
+                {{ title1 }}
+            </h1>
         </div>
 
-        <!-- Mensajes de error mejorados -->
+        <!-- Mensajes de error del formulario (no específicos de campo) -->
         {% if form.non_field_errors %}
-        <div class="max-w-4xl mx-auto mb-8" data-aos="fade-up" data-aos-delay="150">
-            <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-6 rounded-r-xl shadow-lg backdrop-blur-sm">
+        <div class="mx-4 lg:mx-20 mb-6" data-aos="fade-up">
+            <div class="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 rounded-lg max-w-4xl mx-auto">
                 <div class="flex items-start">
                     <div class="flex-shrink-0">
-                        <div class="w-10 h-10 bg-red-100 dark:bg-red-900/40 rounded-full flex items-center justify-center">
-                            <i class="fa-solid fa-exclamation-triangle text-red-600 dark:text-red-400"></i>
-                        </div>
+                        <i class="fa-solid fa-exclamation-triangle text-red-500 text-lg"></i>
                     </div>
-                    <div class="ml-4">
-                        <h3 class="text-red-800 dark:text-red-200 font-semibold text-lg">
-                            Errores encontrados
+                    <div class="ml-3">
+                        <h3 class="text-red-800 dark:text-red-200 font-medium">
+                            Se encontraron errores en el formulario:
                         </h3>
-                        <div class="mt-3 text-red-700 dark:text-red-300">
-                            <ul class="space-y-2">
+                        <div class="mt-2 text-red-700 dark:text-red-300">
+                            <ul class="list-disc list-inside space-y-1">
                                 {% for error in form.non_field_errors %}
-                                <li class="flex items-center">
-                                    <i class="fa-solid fa-circle-xmark text-red-500 mr-2"></i>
-                                    {{ error }}
-                                </li>
+                                <li>{{ error }}</li>
                                 {% endfor %}
                             </ul>
                         </div>
@@ -45,220 +35,215 @@
         </div>
         {% endif %}
 
-        <!-- Formulario principal -->
-        <form method="post" class="max-w-6xl mx-auto">
-            {% csrf_token %}
-            
-            <!-- Contenedor principal con glassmorphism -->
-            <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700/30 overflow-hidden" data-aos="fade-up" data-aos-delay="200">
-                
-                <!-- Header del formulario con vista previa del ícono -->
-                <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-8 text-white">
-                    <div class="text-center">
-                        <div class="inline-block bg-white/20 backdrop-blur-sm rounded-full p-6 mb-4 shadow-lg">
-                            <i id="iconPreview" class="bi bi-x-octagon text-4xl text-white"></i>
+        <form method="post" class="space-y-6 py-4" novalidate>
+            <div class="mx-4 lg:mx-20" data-aos="fade">
+                <div class="bg-white dark:bg-secundario rounded-3xl p-8 max-w-4xl mx-auto"
+                    data-aos="fade-up" data-aos-delay="200">
+                    {% csrf_token %}
+
+                    <!-- Campo dias_semana - Checkboxes -->
+                    <div class="mb-6">
+                        <div class="field-container {% if form.dia_semana.errors %}has-error{% endif %}">
+                            <label class="font-black uppercase text-lg block mb-4 text-center
+                                   {% if form.dia_semana.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                Días de la Semana
+                                {% if form.dia_semana.field.required %}<span class="text-red-500">*</span>{% endif %}
+                            </label>
+                            
+                            <!-- Grid de checkboxes para días de la semana -->
+                            <div class="weekdays-grid">
+                                {% for day in form.dia_semana %}
+                                <div class="day-checkbox-container">
+                                    <label class="day-checkbox-label">
+                                        
+                                        <span class="day-label">{{ day }}</span>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            
+                            {% if form.dia_semana.errors %}
+                            <div class="mt-4 text-red-600 dark:text-red-400 text-sm text-center">
+                                {% for error in form.dia_semana.errors %}
+                                <div class="flex items-center justify-center mt-1">
+                                    <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                    {{ error }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
                         </div>
-                        <h2 class="text-2xl font-bold mb-2">Vista previa del ícono</h2>
-                        <p class="text-blue-100">El ícono se actualizará automáticamente</p>
                     </div>
-                </div>
 
-                <!-- Contenido del formulario -->
-                <div class="p-8 md:p-12 bg-white rounded-b-3xl">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        
-                        <!-- Primera columna -->
-                        <div class="space-y-8">
-                            <!-- Campo dia_semana -->
-                            <div class="field-container {% if form.dia_semana.errors %}has-error{% endif %}" data-aos="fade-right" data-aos-delay="300">
-                                <label for="{{ form.dia_semana.id_for_label }}" class="block text-sm font-semibold mb-3 {% if form.dia_semana.errors %}text-red-600 dark:text-red-400{% else %}text-gray-700 dark:text-gray-300{% endif %}">
-                                    <i class="fa-solid fa-calendar-days mr-2 text-blue-500"></i>
-                                    {{ form.dia_semana.label }}
-                                    {% if form.dia_semana.field.required %}<span class="text-red-500 ml-1">*</span>{% endif %}
-                                </label>
-                                <div class="relative group">
-                                    {{ form.dia_semana }}
-                                    {% if form.dia_semana.errors %}
-                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                {% if form.dia_semana.errors %}
-                                <div class="mt-3 space-y-1">
-                                    {% for error in form.dia_semana.errors %}
-                                    <div class="flex items-center text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 p-2 rounded-lg">
-                                        <i class="fa-solid fa-circle-exclamation mr-2"></i>
-                                        {{ error }}
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Campo hora_inicio -->
-                            <div class="field-container {% if form.hora_inicio.errors %}has-error{% endif %}" data-aos="fade-right" data-aos-delay="350">
-                                <label for="{{ form.hora_inicio.id_for_label }}" class="block text-sm font-semibold mb-3 {% if form.hora_inicio.errors %}text-red-600 dark:text-red-400{% else %}text-gray-700 dark:text-gray-300{% endif %}">
-                                    <i class="fa-solid fa-clock mr-2 text-green-500"></i>
-                                    {{ form.hora_inicio.label }}
-                                    {% if form.hora_inicio.field.required %}<span class="text-red-500 ml-1">*</span>{% endif %}
-                                </label>
-                                <div class="relative group">
-                                    {{ form.hora_inicio }}
-                                    {% if form.hora_inicio.errors %}
-                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
-                                    </div>
-                                    {% endif %}
-                                </div>
+                    <!-- Grid para horarios -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <!-- Campo hora_inicio -->
+                        <div class="field-container {% if form.hora_inicio.errors %}has-error{% endif %}">
+                            <label for="{{ form.hora_inicio.id_for_label }}"
+                                   class="font-black uppercase text-lg block mb-2
+                                   {% if form.hora_inicio.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                {{ form.hora_inicio.label }}
+                                {% if form.hora_inicio.field.required %}<span class="text-red-500">*</span>{% endif %}
+                            </label>
+                            <div class="relative">
+                                {{ form.hora_inicio }}
                                 {% if form.hora_inicio.errors %}
-                                <div class="mt-3 space-y-1">
-                                    {% for error in form.hora_inicio.errors %}
-                                    <div class="flex items-center text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 p-2 rounded-lg">
-                                        <i class="fa-solid fa-circle-exclamation mr-2"></i>
-                                        {{ error }}
-                                    </div>
-                                    {% endfor %}
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-exclamation-circle text-red-500"></i>
                                 </div>
                                 {% endif %}
                             </div>
-
-                            <!-- Campo hora_fin -->
-                            <div class="field-container {% if form.hora_fin.errors %}has-error{% endif %}" data-aos="fade-right" data-aos-delay="400">
-                                <label for="{{ form.hora_fin.id_for_label }}" class="block text-sm font-semibold mb-3 {% if form.hora_fin.errors %}text-red-600 dark:text-red-400{% else %}text-gray-700 dark:text-gray-300{% endif %}">
-                                    <i class="fa-solid fa-clock mr-2 text-orange-500"></i>
-                                    {{ form.hora_fin.label }}
-                                    {% if form.hora_fin.field.required %}<span class="text-red-500 ml-1">*</span>{% endif %}
-                                </label>
-                                <div class="relative group">
-                                    {{ form.hora_fin }}
-                                    {% if form.hora_fin.errors %}
-                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
-                                    </div>
-                                    {% endif %}
+                            {% if form.hora_inicio.errors %}
+                            <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                {% for error in form.hora_inicio.errors %}
+                                <div class="flex items-center mt-1">
+                                    <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                    {{ error }}
                                 </div>
-                                {% if form.hora_fin.errors %}
-                                <div class="mt-3 space-y-1">
-                                    {% for error in form.hora_fin.errors %}
-                                    <div class="flex items-center text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 p-2 rounded-lg">
-                                        <i class="fa-solid fa-circle-exclamation mr-2"></i>
-                                        {{ error }}
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                                {% endif %}
+                                {% endfor %}
                             </div>
+                            {% endif %}
                         </div>
 
-                        <!-- Segunda columna -->
-                        <div class="space-y-8">
-                            <!-- Campo intervalo_desde -->
-                            <div class="field-container {% if form.intervalo_desde.errors %}has-error{% endif %}" data-aos="fade-left" data-aos-delay="300">
-                                <label for="{{ form.intervalo_desde.id_for_label }}" class="block text-sm font-semibold mb-3 {% if form.intervalo_desde.errors %}text-red-600 dark:text-red-400{% else %}text-gray-700 dark:text-gray-300{% endif %}">
-                                    <i class="fa-solid fa-stopwatch mr-2 text-purple-500"></i>
-                                    {{ form.intervalo_desde.label }}
-                                    {% if form.intervalo_desde.field.required %}<span class="text-red-500 ml-1">*</span>{% endif %}
-                                </label>
-                                <div class="relative group">
-                                    {{ form.intervalo_desde }}
-                                    {% if form.intervalo_desde.errors %}
-                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
-                                    </div>
-                                    {% endif %}
+                        <!-- Campo hora_fin -->
+                        <div class="field-container {% if form.hora_fin.errors %}has-error{% endif %}">
+                            <label for="{{ form.hora_fin.id_for_label }}"
+                                   class="font-black uppercase text-lg block mb-2
+                                   {% if form.hora_fin.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                {{ form.hora_fin.label }}
+                                {% if form.hora_fin.field.required %}<span class="text-red-500">*</span>{% endif %}
+                            </label>
+                            <div class="relative">
+                                {{ form.hora_fin }}
+                                {% if form.hora_fin.errors %}
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-exclamation-circle text-red-500"></i>
                                 </div>
+                                {% endif %}
+                            </div>
+                            {% if form.hora_fin.errors %}
+                            <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                {% for error in form.hora_fin.errors %}
+                                <div class="flex items-center mt-1">
+                                    <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                    {{ error }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Grid para intervalos -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <!-- Campo intervalo_desde -->
+                        <div class="field-container {% if form.intervalo_desde.errors %}has-error{% endif %}">
+                            <label for="{{ form.intervalo_desde.id_for_label }}"
+                                   class="font-black uppercase text-lg block mb-2
+                                   {% if form.intervalo_desde.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                {{ form.intervalo_desde.label }}
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                {{ form.intervalo_desde }}
                                 {% if form.intervalo_desde.errors %}
-                                <div class="mt-3 space-y-1">
-                                    {% for error in form.intervalo_desde.errors %}
-                                    <div class="flex items-center text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 p-2 rounded-lg">
-                                        <i class="fa-solid fa-circle-exclamation mr-2"></i>
-                                        {{ error }}
-                                    </div>
-                                    {% endfor %}
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-exclamation-circle text-red-500"></i>
                                 </div>
                                 {% endif %}
                             </div>
-
-                            <!-- Campo intervalo_hasta -->
-                            <div class="field-container {% if form.intervalo_hasta.errors %}has-error{% endif %}" data-aos="fade-left" data-aos-delay="350">
-                                <label for="{{ form.intervalo_hasta.id_for_label }}" class="block text-sm font-semibold mb-3 {% if form.intervalo_hasta.errors %}text-red-600 dark:text-red-400{% else %}text-gray-700 dark:text-gray-300{% endif %}">
-                                    <i class="fa-solid fa-stopwatch mr-2 text-indigo-500"></i>
-                                    {{ form.intervalo_hasta.label }}
-                                    {% if form.intervalo_hasta.field.required %}<span class="text-red-500 ml-1">*</span>{% endif %}
-                                </label>
-                                <div class="relative group">
-                                    {{ form.intervalo_hasta }}
-                                    {% if form.intervalo_hasta.errors %}
-                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
-                                    </div>
-                                    {% endif %}
+                            {% if form.intervalo_desde.errors %}
+                            <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                {% for error in form.intervalo_desde.errors %}
+                                <div class="flex items-center mt-1">
+                                    <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                    {{ error }}
                                 </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Campo intervalo_hasta -->
+                        <div class="field-container {% if form.intervalo_hasta.errors %}has-error{% endif %}">
+                            <label for="{{ form.intervalo_hasta.id_for_label }}"
+                                   class="font-black uppercase text-lg block mb-2
+                                   {% if form.intervalo_hasta.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                {{ form.intervalo_hasta.label }}
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                {{ form.intervalo_hasta }}
                                 {% if form.intervalo_hasta.errors %}
-                                <div class="mt-3 space-y-1">
-                                    {% for error in form.intervalo_hasta.errors %}
-                                    <div class="flex items-center text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 p-2 rounded-lg">
-                                        <i class="fa-solid fa-circle-exclamation mr-2"></i>
-                                        {{ error }}
-                                    </div>
-                                    {% endfor %}
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-exclamation-circle text-red-500"></i>
                                 </div>
                                 {% endif %}
                             </div>
+                            {% if form.intervalo_hasta.errors %}
+                            <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                {% for error in form.intervalo_hasta.errors %}
+                                <div class="flex items-center mt-1">
+                                    <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                    {{ error }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
 
-                            <!-- Campo activo -->
-                            <div class="field-container {% if form.activo.errors %}has-error{% endif %}" data-aos="fade-left" data-aos-delay="400">
-                                <label for="{{ form.activo.id_for_label }}" class="block text-sm font-semibold mb-3 {% if form.activo.errors %}text-red-600 dark:text-red-400{% else %}text-gray-700 dark:text-gray-300{% endif %}">
-                                    <i class="fa-solid fa-toggle-on mr-2 text-emerald-500"></i>
-                                    {{ form.activo.label }}
-                                    {% if form.activo.field.required %}<span class="text-red-500 ml-1">*</span>{% endif %}
-                                </label>
-                                <div class="relative group">
-                                    <div class="flex items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border-2 border-gray-200 dark:border-gray-600 transition-all duration-300 group-hover:border-blue-300 dark:group-hover:border-blue-500">
-                                        {{ form.activo }}
-                                        <span class="ml-3 text-gray-700 dark:text-gray-300">Habilitar este horario</span>
-                                    </div>
-                                    {% if form.activo.errors %}
-                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                        <i class="fa-solid fa-exclamation-circle text-red-500"></i>
-                                    </div>
-                                    {% endif %}
-                                </div>
+                    <!-- Campo activo - Solo una vez -->
+                    <div class="mb-6">
+                        <div class="field-container {% if form.activo.errors %}has-error{% endif %}">
+                            <label for="{{ form.activo.id_for_label }}"
+                                   class="font-black uppercase text-lg block mb-2
+                                   {% if form.activo.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                {{ form.activo.label }}
+                                {% if form.activo.field.required %}<span class="text-red-500">*</span>{% endif %}
+                            </label>
+                            <div class="checkbox-container">
+                                {{ form.activo }}
+                                <span class="text-gray-700 dark:text-gray-300">Habilitar este horario</span>
                                 {% if form.activo.errors %}
-                                <div class="mt-3 space-y-1">
-                                    {% for error in form.activo.errors %}
-                                    <div class="flex items-center text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 p-2 rounded-lg">
-                                        <i class="fa-solid fa-circle-exclamation mr-2"></i>
-                                        {{ error }}
-                                    </div>
-                                    {% endfor %}
+                                <div class="ml-auto flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-exclamation-circle text-red-500"></i>
                                 </div>
                                 {% endif %}
                             </div>
+                            {% if form.activo.errors %}
+                            <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                {% for error in form.activo.errors %}
+                                <div class="flex items-center mt-1">
+                                    <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                    {{ error }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
 
                     <!-- Campo descripción - ancho completo -->
-                    <div class="mt-8 field-container {% if form.descripcion.errors %}has-error{% endif %}" data-aos="fade-up" data-aos-delay="450">
-                        <label for="{{ form.descripcion.id_for_label }}" class="block text-sm font-semibold mb-3 {% if form.descripcion.errors %}text-red-600 dark:text-red-400{% else %}text-gray-700 dark:text-gray-300{% endif %}">
-                            <i class="fa-solid fa-file-text mr-2 text-teal-500"></i>
+                    <div class="field-container {% if form.descripcion.errors %}has-error{% endif %} mb-6">
+                        <label for="{{ form.descripcion.id_for_label }}"
+                               class="font-black uppercase text-lg block mb-2
+                               {% if form.descripcion.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
                             {{ form.descripcion.label }}
-                            {% if form.descripcion.field.required %}<span class="text-red-500 ml-1">*</span>{% endif %}
+                            {% if form.descripcion.field.required %}<span class="text-red-500">*</span>{% endif %}
                         </label>
-                        <div class="relative group">
+                        <div class="relative">
                             {{ form.descripcion }}
                             {% if form.descripcion.errors %}
-                            <div class="absolute top-3 right-3 flex items-center">
+                            <div class="absolute top-3 right-3 flex items-center pointer-events-none">
                                 <i class="fa-solid fa-exclamation-circle text-red-500"></i>
                             </div>
                             {% endif %}
                         </div>
                         {% if form.descripcion.errors %}
-                        <div class="mt-3 space-y-1">
+                        <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
                             {% for error in form.descripcion.errors %}
-                            <div class="flex items-center text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 p-2 rounded-lg">
-                                <i class="fa-solid fa-circle-exclamation mr-2"></i>
+                            <div class="flex items-center mt-1">
+                                <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
                                 {{ error }}
                             </div>
                             {% endfor %}
@@ -267,17 +252,14 @@
                     </div>
 
                     <!-- Botones de acción -->
-                    <div class="flex flex-col sm:flex-row justify-center items-center mt-12 space-y-4 sm:space-y-0 sm:space-x-6" data-aos="fade-up" data-aos-delay="500">
-                        <button type="submit" class="group relative w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 px-8 rounded-xl font-semibold shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center">
-                            <i class="fa-solid fa-save mr-3 group-hover:scale-110 transition-transform duration-300"></i>
-                            Guardar Horario de Atención
-                            <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 rounded-xl transition-opacity duration-300"></div>
+                    <div class="flex flex-col md:flex-row justify-center items-center gap-4 mt-6">
+                        <button type="submit"
+                                class="w-full md:w-auto bg-blue-700 hover:bg-blue-800 text-white py-3 px-8 rounded-lg flex items-center justify-center transition-all duration-300 font-medium shadow-lg hover:shadow-xl">
+                            <i class="fa-solid fa-save mr-2"></i>Guardar Horario de Atención
                         </button>
-                        
-                        <a href="{% url 'doctor:horarioatenciones_list' %}" class="group relative w-full sm:w-auto bg-gradient-to-r from-gray-600 to-gray-700 hover:from-red-600 hover:to-red-700 text-white py-4 px-8 rounded-xl font-semibold shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center from-red-400 to-red-500">
-                            <i class="fa-solid fa-xmark mr-3 group-hover:scale-110 transition-transform duration-300"></i>
-                            Cancelar
-                            <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 rounded-xl transition-opacity duration-300"></div>
+                        <a class="w-full md:w-auto bg-red-700 hover:bg-red-800 text-white py-3 px-8 rounded-lg flex items-center justify-center transition-all duration-300 font-medium shadow-lg hover:shadow-xl"
+                           href="{% url 'doctor:horarioatenciones_list' %}">
+                            <i class="fa-solid fa-xmark mr-2"></i>Cancelar
                         </a>
                     </div>
                 </div>
@@ -286,151 +268,259 @@
     </div>
 </section>
 
-<!-- Estilos CSS mejorados -->
 <style>
-/* Estilos base para los campos de formulario */
-input, select, textarea {
-    @apply w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl 
-           bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 
-           focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 
-           transition-all duration-300 placeholder-gray-400 dark:placeholder-gray-500;
+/* Grid personalizado para días de la semana con centrado inteligente */
+.weekdays-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    justify-items: center;
 }
 
-/* Hover effects para campos normales */
-input:hover, select:hover, textarea:hover {
-    @apply border-gray-300 dark:border-gray-500;
+/* En pantallas medianas y grandes, usar 7 columnas */
+@media (min-width: 768px) {
+    .weekdays-grid {
+        grid-template-columns: repeat(7, 1fr);
+    }
+}
+
+/* En pantallas pequeñas, los últimos 3 elementos se centran */
+@media (max-width: 767px) {
+    .weekdays-grid .day-checkbox-container:nth-child(5) {
+        grid-column: 1 / 3;
+        justify-self: center;
+    }
+    
+    .weekdays-grid .day-checkbox-container:nth-child(6) {
+        grid-column: 3 / 5;
+        justify-self: center;
+    }
+    
+    .weekdays-grid .day-checkbox-container:nth-child(7) {
+        grid-column: 2 / 4;
+        justify-self: center;
+    }
+}
+
+/* Estilos para checkboxes de días de la semana */
+.day-checkbox-container {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 0.75rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 100%;
+    max-width: 120px;
+}
+
+.day-checkbox-container:hover {
+    border-color: #3b82f6;
+    background-color: #f8fafc;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.day-checkbox-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    width: 100%;
+}
+
+.day-checkbox {
+    width: 1.5rem;
+    height: 1.5rem;
+    accent-color: #3b82f6;
+    cursor: pointer;
+    margin: 0;
+}
+
+.day-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-align: center;
+    color: #374151;
+    line-height: 1.2;
+}
+
+/* Estado activo cuando está seleccionado */
+.day-checkbox:checked + .day-label {
+    color: #3b82f6;
+}
+
+.day-checkbox:checked ~ .day-checkbox-container,
+.day-checkbox-container:has(.day-checkbox:checked) {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+}
+
+/* Estilos para modo oscuro - días de la semana */
+@media (prefers-color-scheme: dark) {
+    .day-checkbox-container {
+        background-color: #374151;
+        border-color: #4b5563;
+    }
+    
+    .day-checkbox-container:hover {
+        border-color: #60a5fa;
+        background-color: #4b5563;
+    }
+    
+    .day-label {
+        color: #f9fafb;
+    }
+    
+    .day-checkbox:checked + .day-label {
+        color: #60a5fa;
+    }
+    
+    .day-checkbox-container:has(.day-checkbox:checked) {
+        border-color: #60a5fa;
+        background-color: #1e3a8a;
+    }
+    
+    .day-checkbox {
+        accent-color: #60a5fa;
+    }
 }
 
 /* Estilos para campos con errores */
 .field-container.has-error input,
 .field-container.has-error select,
 .field-container.has-error textarea {
-    @apply border-red-500 bg-red-50 dark:bg-red-900/20 text-red-900 dark:text-red-100;
+    border-color: #ef4444 !important;
+    background-color: rgba(254, 242, 242, 0.5) !important;
+    color: #991b1b !important;
 }
 
 .field-container.has-error input:focus,
 .field-container.has-error select:focus,
 .field-container.has-error textarea:focus {
-    @apply border-red-500 ring-red-200 dark:ring-red-800;
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+    outline: none !important;
 }
 
-/* Estilos para checkboxes */
-input[type="checkbox"] {
-    @apply w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded 
-           focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 
-           focus:ring-2 dark:bg-gray-700 dark:border-gray-600;
-}
-
-.field-container.has-error input[type="checkbox"] {
-    @apply border-red-500 bg-red-50 dark:bg-red-900/20;
-}
-
-/* Animación de shake para errores */
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
-    20%, 40%, 60%, 80% { transform: translateX(3px); }
-}
-
-.field-container.has-error {
-    animation: shake 0.6s ease-in-out;
-}
-
-/* Efectos de hover para grupos de campos */
-.group:hover input,
-.group:hover select,
-.group:hover textarea {
-    @apply border-blue-300 dark:border-blue-500;
-}
-
-/* Estilos para textareas */
-textarea {
-    @apply min-h-[120px] resize-y;
-}
-
-/* Efectos de glassmorphism adicionales */
-.backdrop-blur-xl {
-    backdrop-filter: blur(16px);
-}
-
-/* Animaciones de entrada más suaves */
-[data-aos] {
-    transition-property: transform, opacity;
-    transition-duration: 0.6s;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Mejoras para modo oscuro */
-@media (prefers-color-scheme: dark) {
-    .bg-white\/80 {
-        background-color: rgba(31, 41, 55, 0.8);
-    }
-    
-    .border-white\/20 {
-        border-color: rgba(107, 114, 128, 0.3);
-    }
-}
-
-/* Efectos de resplandor para campos activos */
-input:focus, select:focus, textarea:focus {
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-/* Estilos para labels más atractivos */
-label {
+/* Estilos base para campos de formulario */
+.field-container input,
+.field-container select,
+.field-container textarea {
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #d1d5db;
+    background-color: white;
     transition: all 0.3s ease;
 }
 
-label:hover {
-    transform: translateX(2px);
+/* Centrar el texto del select de días de la semana */
+.field-container select {
+    text-align: center;
+    text-align-last: center;
+    -moz-text-align-last: center; /* Para Firefox */
+}
+
+.field-container textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* Contenedor para checkbox con alineación perfecta */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+}
+
+.checkbox-container input[type="checkbox"] {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0;
+    flex-shrink: 0;
+    vertical-align: middle;
+    accent-color: #3b82f6;
+    cursor: pointer;
+}
+
+.checkbox-container span {
+    margin: 0;
+    line-height: 1.2;
+    flex-grow: 1;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+/* Hacer clickeable toda la etiqueta del checkbox */
+.checkbox-container label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    width: 100%;
+}
+
+/* Estilos para modo oscuro */
+@media (prefers-color-scheme: dark) {
+    .field-container input,
+    .field-container select,
+    .field-container textarea {
+        background-color: #374151;
+        border-color: #4b5563;
+        color: #f9fafb;
+    }
+
+    .field-container input:focus,
+    .field-container select:focus,
+    .field-container textarea:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+    }
+
+    .field-container.has-error input,
+    .field-container.has-error select,
+    .field-container.has-error textarea {
+        background-color: rgba(153, 27, 27, 0.2) !important;
+        color: #fca5a5 !important;
+        border-color: #ef4444 !important;
+    }
+    
+    .field-container.has-error input:focus,
+    .field-container.has-error select:focus,
+    .field-container.has-error textarea:focus {
+        box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.4) !important;
+    }
+
+    .checkbox-container input[type="checkbox"] {
+        accent-color: #60a5fa;
+    }
+}
+
+/* Hover effects */
+.field-container input:hover,
+.field-container select:hover,
+.field-container textarea:hover {
+    border-color: #9ca3af;
+}
+
+.checkbox-container:hover input[type="checkbox"] {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+    .field-container input:hover,
+    .field-container select:hover,
+    .field-container textarea:hover {
+        border-color: #6b7280;
+    }
 }
 </style>
-
-<!-- JavaScript mejorado -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const iconInput = document.getElementById('{{ form.icon.id_for_label }}');
-    const iconPreview = document.getElementById('iconPreview');
-    
-    function updateIconPreview() {
-        const iconClass = iconInput?.value?.trim();
-        if (iconClass) {
-            iconPreview.className = iconClass + ' text-4xl text-white transition-all duration-300';
-        } else {
-            iconPreview.className = 'bi bi-x-octagon text-4xl text-white transition-all duration-300';
-        }
-    }
-    
-    // Actualizar vista previa al cargar la página
-    if (iconInput) {
-        updateIconPreview();
-        
-        // Event listeners para actualizar la vista previa
-        iconInput.addEventListener('input', updateIconPreview);
-        iconInput.addEventListener('keyup', updateIconPreview);
-        iconInput.addEventListener('change', updateIconPreview);
-    }
-    
-    // Añadir efectos de animación a los campos con errores
-    const fieldsWithErrors = document.querySelectorAll('.field-container.has-error');
-    fieldsWithErrors.forEach(field => {
-        field.addEventListener('animationend', () => {
-            field.style.animation = '';
-        });
-    });
-    
-    // Mejorar la experiencia del usuario con efectos de focus
-    const formFields = document.querySelectorAll('input, select, textarea');
-    formFields.forEach(field => {
-        field.addEventListener('focus', function() {
-            this.parentElement.classList.add('ring-2', 'ring-blue-200', 'dark:ring-blue-800');
-        });
-        
-        field.addEventListener('blur', function() {
-            this.parentElement.classList.remove('ring-2', 'ring-blue-200', 'dark:ring-blue-800');
-        });
-    });
-});
-</script>
 
 {% endblock %}

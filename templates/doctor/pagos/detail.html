@@ -1,0 +1,96 @@
+{% extends 'home.html' %}
+{% load static %}
+
+<title>{% block title %}{{ title1 }}{% endblock %}</title>
+
+{% block content %}
+<section class="dark:bg-principal mt-4">
+
+    <!-- Título -->
+    <div class="text-center">
+        <h1 class="rounded-2xl bg-indigo-500 px-4 py-2 text-white uppercase text-3xl">
+            {{ title1 }}
+        </h1>
+    </div>
+
+    <!-- Cabecera del Pago -->
+    <div class="max-w-3xl mx-auto mt-8 p-6 bg-white dark:bg-secundario rounded-2xl shadow-lg">
+        <h2 class="text-xl font-bold text-center mb-4 dark:text-blue-300">Cabecera del Pago</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-base dark:text-gray-300">
+            <div><strong>ID:</strong> {{ pago.id }}</div>
+            <div><strong>Atención:</strong> {{ pago.atencion }}</div>
+            <div><strong>Método de Pago:</strong> {{ pago.metodo_pago }}</div>
+            <div><strong>Monto Total:</strong> ${{ pago.monto_total }}</div>
+            <div><strong>Estado:</strong> {{ pago.estado }}</div>
+            <div><strong>Fecha de Pago:</strong> {{ pago.fecha_pago }}</div>
+            <div><strong>Fecha de Creación:</strong> {{ pago.fecha_creacion }}</div>
+            <div><strong>Nombre del Pagador:</strong> {{ pago.nombre_pagador }}</div>
+            <div><strong>Referencia Externa:</strong> {{ pago.referencia_externa }}</div>
+            <div><strong>Observaciones:</strong> {{ pago.observaciones }}</div>
+            <div><strong>Activo:</strong>
+                {% if pago.activo %}
+                    <span class="text-green-600 font-bold">Sí ✅</span>
+                {% else %}
+                    <span class="text-red-600 font-bold">No ❌</span>
+                {% endif %}
+            </div>
+            <div>
+                <strong>Evidencia de Pago:</strong>
+                {% if pago.evidencia_pago %}
+                    <a href="{{ pago.evidencia_pago.url }}" target="_blank" class="text-blue-600 hover:underline">Ver Evidencia</a>
+                {% else %}
+                    No disponible
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Detalle del Pago -->
+    <div class="max-w-5xl mx-auto mt-8 p-6 bg-white dark:bg-secundario rounded-2xl shadow-lg">
+        <h2 class="text-xl font-bold text-center mb-4 dark:text-blue-300">Detalle del Pago</h2>
+
+        {% if detalle_pagos %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm text-center">
+                <thead class="uppercase bg-gray-50 dark:bg-[#1f2937] dark:text-blue-300">
+                    <tr>
+                        <th class="px-4 py-2">#</th>
+                        <th class="px-4 py-2">Descripción</th>
+                        <th class="px-4 py-2">Monto</th>
+                        <th class="px-4 py-2">Fecha Creación</th>
+                        <th class="px-4 py-2">Activo</th>
+                    </tr>
+                </thead>
+                <tbody class="dark:text-gray-300">
+                    {% for detalle in detalle_pagos %}
+                    <tr class="border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-[#374151]">
+                        <td class="px-4 py-2">{{ forloop.counter }}</td>
+                        <td class="px-4 py-2">{{ detalle.descripcion }}</td>
+                        <td class="px-4 py-2">${{ detalle.monto }}</td>
+                        <td class="px-4 py-2">{{ detalle.fecha_creacion }}</td>
+                        <td class="px-4 py-2">
+                            {% if detalle.activo %}
+                                <span class="text-green-600 font-semibold">Sí ✅</span>
+                            {% else %}
+                                <span class="text-red-600 font-semibold">No ❌</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-center text-gray-600 dark:text-gray-400 mt-4">No hay detalles registrados para este pago.</p>
+        {% endif %}
+    </div>
+
+    <!-- Botón volver -->
+    <div class="flex justify-center mt-6">
+        <a href="{{ back_url }}" class="bg-blue-700 hover:bg-blue-800 text-white py-2 px-6 rounded-lg transition-all">
+            <i class="fa-solid fa-arrow-left mr-2"></i> Volver
+        </a>
+    </div>
+
+</section>
+{% endblock %}

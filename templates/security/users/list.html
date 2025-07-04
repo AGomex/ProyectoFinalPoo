@@ -6,13 +6,9 @@
     <section class="dark:bg-principal mt-2">
         <div class="text-center" data-aos="fade-up" data-aos-delay="200">
             <div class="sm:pt-8 lg:pt-4">
-                
                     <h1 class="rounded-2xl  bg-indigo-500 px-2 py-1 text-white uppercase text-4xl">
                         {{ title1 }}
                     </h1>
-               
-            
-               
             </div>
             <div class="lg:p-2 rounded-3xl" data-aos="fade-up" data-aos-delay="200">
                 <!-- Barra de búsqueda -->
@@ -41,11 +37,11 @@
                         <thead class="uppercase font-Tiny5 bg-gray-50 dark:bg-secundario dark:text-blue-300">
                             <tr>
                                 <th scope="col" class="px-6 py-3">Nombre de usuario</th>
-                                <th scope="col" class="px-6 py-3">DNI</th>
-                                <th scope="col" class="px-6 py-3">Imagen</th>
+                                <th scope="col" class="px-6 py-3">Cédula</th>
+                                <th scope="col" class="px-6 py-3">Foto de perfil</th>
                                 <th scope="col" class="px-6 py-3">Email</th>
-                                <th scope="col" class="px-6 py-3">Direction</th>
-                                <th scope="col" class="px-6 py-3">Phone</th>
+                                <th scope="col" class="px-6 py-3">Dirección</th>
+                                <th scope="col" class="px-6 py-3">Teléfono</th>
                                 <th scope="col" class="px-6 py-3">Acciones</th>
                             </tr>
                         </thead>
@@ -136,8 +132,8 @@
    <script>
 function openDeleteModal(id, name) {
     const deleteForm = document.getElementById('deleteForm');
-    deleteForm.action = `{% url 'security:user_delete' 0 %}`.replace('0', id);
-    document.getElementById('Description').textContent = `ID: ${id} - ${name}`;
+    deleteForm.action = {% url 'security:user_delete' 0 %}.replace('0', id);
+    document.getElementById('Description').textContent = ID: ${id} - ${name};
     document.getElementById('deleteModal').classList.remove('hidden');
 }
 

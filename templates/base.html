@@ -120,7 +120,91 @@
                             <span>Iniciar Sesión</span>
                         </a>
                     {% endif %}
+                    <!-- Botón flotante del chat bot - ESTILO SALUDTOTAL -->
+    <div class="bottom-6" >
+        <button id="openChatBtn" class="relative w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none border-2 border-white">
+            <div class="w-full h-full rounded-full overflow-hidden">
+                <img src="{% static 'img/bot.png' %}" alt="ChatBot" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="w-full h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center" style="display: none;">
+                    <i class="fas fa-robot text-white text-lg"></i>
+            
+            </div>
+            
+            <!-- Badge de notificación -->
+            <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold shadow-md">
+                1
+            </span>
+            
+            <!-- Tooltip -->
+            <div class="absolute right-full mr-3 top-1/2 transform -translate-y-1/2 bg-gray-900 text-white text-sm px-3 py-2 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap">
+                Chat de Ayuda
+                <div class="absolute left-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-l-gray-900"></div>
+            </div>
+        </button>
+    </div>
+</div>
                 </div>
+             
+                <!-- Ventana del chat -->
+<div id="chatContainer" class="fixed bottom-20 right-6 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 hidden z-50 transform transition-all duration-300">
+  <!-- Header del chat (zona de arrastre) -->
+  <div id="chatHeader" class="flex items-center justify-between p-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-xl cursor-move select-none">
+    <div class="flex items-center space-x-2">
+      <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+      <span class="font-bold">Asistente Clínico</span>
+    </div>
+    <div class="flex items-center space-x-2">
+      <button id="minimizeChatBtn" class="text-white hover:bg-blue-800 rounded px-2 py-1 transition">−</button>
+      <button id="closeChatBtn" class="text-white hover:bg-blue-800 rounded px-2 py-1 transition">&times;</button>
+    </div>
+  </div>
+  
+  <!-- Área de mensajes -->
+  <div id="chatMessages" class="p-4 h-64 overflow-y-auto text-sm space-y-3 bg-gray-50 relative">
+    <!-- Mensaje de bienvenida -->
+    <div class="text-left animate-fade-in">
+      <div class="flex items-start space-x-2">
+        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div class="bg-white px-3 py-2 rounded-lg shadow-sm border max-w-xs">
+          <p class="text-gray-800">¡Hola! Soy tu asistente clínico. ¿En qué puedo ayudarte hoy?</p>
+          <span class="text-xs text-gray-500 mt-1 block">Ahora</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Indicador de escritura -->
+  <div id="typingIndicator" class="px-4 py-2 hidden">
+    <div class="flex items-center space-x-2">
+      <div class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs">
+        <i class="fas fa-robot"></i>
+      </div>
+      <div class="flex space-x-1">
+        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+        <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Input del chat -->
+  <div class="flex p-3 border-t bg-white rounded-b-xl">
+    <div class="flex-1 relative">
+      <input id="chatInput" type="text" placeholder="Escribe tu pregunta..." 
+             class="w-full px-3 py-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      <button id="emojiBtn" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
+      </button>
+    </div>
+    <button id="sendChatBtn" class="bg-blue-600 text-white px-4 rounded-r-md hover:bg-blue-700 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+      <i class="fas fa-paper-plane"></i>
+    </button>
+  </div>
+</div>
+
+<!-- Overlay para cuando el chat está minimizado -->
+<div id="chatOverlay" class="fixed inset-0 bg-black bg-opacity-20 hidden z-40"></div>
             </div>
         </div>
     </header>
@@ -273,5 +357,305 @@ document.querySelectorAll('.module-card').forEach(card => {
 {% endblock %}
 {% block content %}{% endblock content %} 
 </div> 
+
+
+<style>
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-bounce {
+  animation: bounce 1.4s infinite;
+}
+
+.chat-message {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* Estilos para el scroll personalizado */
+#chatMessages::-webkit-scrollbar {
+  width: 4px;
+}
+
+#chatMessages::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+#chatMessages::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 2px;
+}
+
+#chatMessages::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+#chatInputContainer {
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;}
+#chatInput {
+    width: 100%;
+    height: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 20px;
+    font-size: 14px;
+    outline: none;
+    background: #f9fafb;
+    resize: none;
+    }
+
+        #chatInput:focus {
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        #sendChatBtn {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+
+        #sendChatBtn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        #sendChatBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const openBtn = document.getElementById("openChatBtn");
+  const closeBtn = document.getElementById("closeChatBtn");
+  const minimizeBtn = document.getElementById("minimizeChatBtn");
+  const chatBox = document.getElementById("chatContainer");
+  const chatInput = document.getElementById("chatInput");
+  const chatMessages = document.getElementById("chatMessages");
+  const sendBtn = document.getElementById("sendChatBtn");
+  const typingIndicator = document.getElementById("typingIndicator");
+  const notificationBadge = document.getElementById("notificationBadge");
+  const chatHeader = document.getElementById("chatHeader");
+  const chatOverlay = document.getElementById("chatOverlay");
+
+  let isMinimized = false;
+  let dragData = { isDragging: false, startX: 0, startY: 0, offsetX: 0, offsetY: 0 };
+
+  // Funcionalidad de arrastrar
+  chatHeader.addEventListener("mousedown", startDrag);
+  document.addEventListener("mousemove", drag);
+  document.addEventListener("mouseup", stopDrag);
+
+  function startDrag(e) {
+    dragData.isDragging = true;
+    const rect = chatBox.getBoundingClientRect();
+    dragData.startX = e.clientX;
+    dragData.startY = e.clientY;
+    dragData.offsetX = e.clientX - rect.left;
+    dragData.offsetY = e.clientY - rect.top;
+    chatBox.style.transition = "none";
+    chatOverlay.classList.remove("hidden");
+  }
+
+  function drag(e) {
+    if (!dragData.isDragging) return;
+    
+    e.preventDefault();
+    let newX = e.clientX - dragData.offsetX;
+    let newY = e.clientY - dragData.offsetY;
+    
+    // Limitar el movimiento dentro de la ventana
+    const maxX = window.innerWidth - chatBox.offsetWidth;
+    const maxY = window.innerHeight - chatBox.offsetHeight;
+    
+    newX = Math.max(0, Math.min(newX, maxX));
+    newY = Math.max(0, Math.min(newY, maxY));
+    
+    chatBox.style.position = "fixed";
+    chatBox.style.left = newX + "px";
+    chatBox.style.top = newY + "px";
+    chatBox.style.right = "auto";
+    chatBox.style.bottom = "auto";
+  }
+
+  function stopDrag() {
+    if (dragData.isDragging) {
+      dragData.isDragging = false;
+      chatBox.style.transition = "transform 0.3s ease";
+      chatOverlay.classList.add("hidden");
+    }
+  }
+
+  // Eventos de botones
+  openBtn.addEventListener("click", () => {
+    chatBox.classList.remove("hidden");
+    chatInput.focus();
+    notificationBadge.classList.add("hidden");
+  });
+
+  closeBtn.addEventListener("click", () => {
+    chatBox.classList.add("hidden");
+    isMinimized = false;
+  });
+
+  minimizeBtn.addEventListener("click", () => {
+    isMinimized = !isMinimized;
+    if (isMinimized) {
+      chatBox.style.transform = "scale(0.8)";
+      chatBox.style.opacity = "0.7";
+    } else {
+      chatBox.style.transform = "scale(1)";
+      chatBox.style.opacity = "1";
+    }
+  });
+
+  // Funcionalidad de envío
+  sendBtn.addEventListener("click", sendMessage);
+  chatInput.addEventListener("keypress", function(e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  // Deshabilitar botón cuando no hay texto
+  chatInput.addEventListener("input", function() {
+    sendBtn.disabled = !this.value.trim();
+  });
+
+  function sendMessage() {
+    const message = chatInput.value.trim();
+    if (!message) return;
+
+    // Crear mensaje del usuario
+    const userMessage = createUserMessage(message);
+    chatMessages.appendChild(userMessage);
+    chatInput.value = "";
+    sendBtn.disabled = true;
+
+    // Mostrar indicador de escritura
+    typingIndicator.classList.remove("hidden");
+    scrollToBottom();
+
+    // Enviar mensaje al servidor
+    fetch("{% url 'chatbot:chatbot_view' %}", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: `message=${encodeURIComponent(message)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Ocultar indicador de escritura
+      typingIndicator.classList.add("hidden");
+      
+      // Crear mensaje del bot
+      const botMessage = createBotMessage(data.response);
+      chatMessages.appendChild(botMessage);
+      scrollToBottom();
+      
+      // Mostrar notificación si el chat está cerrado
+      if (chatBox.classList.contains("hidden")) {
+        notificationBadge.classList.remove("hidden");
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      typingIndicator.classList.add("hidden");
+      const errorMessage = createBotMessage("Lo siento, hubo un error al procesar tu mensaje. Intenta de nuevo.");
+      chatMessages.appendChild(errorMessage);
+      scrollToBottom();
+    });
+  }
+
+  function createUserMessage(text) {
+    const messageDiv = document.createElement("div");
+    messageDiv.className = "text-right chat-message";
+    messageDiv.innerHTML = `
+      <div class="flex items-end justify-end space-x-2">
+        <div class="bg-blue-600 text-white px-3 py-2 rounded-lg max-w-xs shadow-sm">
+          <p>${escapeHtml(text)}</p>
+          <span class="text-xs opacity-75 mt-1 block">${getCurrentTime()}</span>
+        </div>
+        <div class="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+          <i class="fas fa-user"></i>
+        </div>
+      </div>
+    `;
+    return messageDiv;
+  }
+
+  function createBotMessage(text) {
+    const messageDiv = document.createElement("div");
+    messageDiv.className = "text-left chat-message";
+    messageDiv.innerHTML = `
+      <div class="flex items-start space-x-2">
+        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div class="bg-white px-3 py-2 rounded-lg shadow-sm border max-w-xs">
+          <p class="text-gray-800">${escapeHtml(text)}</p>
+          <span class="text-xs text-gray-500 mt-1 block">${getCurrentTime()}</span>
+        </div>
+      </div>
+    `;
+    return messageDiv;
+  }
+
+  function scrollToBottom() {
+    setTimeout(() => {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }, 100);
+  }
+
+  function getCurrentTime() {
+    const now = new Date();
+    return now.toLocaleTimeString('es-ES', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Inicializar
+  sendBtn.disabled = true;
+  scrollToBottom();
+});
+</script>
 </body> 
+
+
+
 </html>

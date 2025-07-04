@@ -20,8 +20,7 @@ class UserForm(ModelForm):
         model = User
         fields = [
             "username",
-            "first_name",
-            "last_name",
+            "password",
             "dni",
             "image",
             "email",
@@ -29,6 +28,7 @@ class UserForm(ModelForm):
             "phone",
             "groups",
         ]
+        
         error_messages = {
             "username": {
                 "unique": "Ya existe un usuario con este nombre de usuario.",
@@ -39,20 +39,16 @@ class UserForm(ModelForm):
                 "required": "El email es obligatorio.",
             },
         }
+       
         widgets = {
             "username": forms.TextInput(attrs={
                 "placeholder": "Ingrese nombre de usuario",
                 "id": "id_username",
                 "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500",
             }),
-            "first_name": forms.TextInput(attrs={
-                "placeholder": "Ingrese nombre",
-                "id": "id_first_name",
-                "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5",
-            }),
-            "last_name": forms.TextInput(attrs={
-                "placeholder": "Ingrese apellido",
-                "id": "id_last_name",
+            "password": forms.PasswordInput(attrs={
+                "placeholder": "Ingrese contraseña",
+                "id": "id_password",
                 "class": "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5",
             }),
             "dni": forms.TextInput(attrs={

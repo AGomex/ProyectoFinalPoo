@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'widget_tweaks',
+    'chatbot',
 ]
 # Aplicaciones de terceros
 THIRD_PARTY_APPS = [

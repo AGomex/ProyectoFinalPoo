@@ -1,0 +1,295 @@
+{% extends 'home.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+
+<section class="dark:bg-principal min-h-screen py-8">
+    <div class="container mx-auto px-4">
+        <!-- Título Principal -->
+        <div class="text-center mb-8" data-aos="fade-down">
+            <h1 class="inline-block bg-blue-600 text-white px-8 py-4 rounded-lg text-3xl font-bold shadow-lg">
+                {{ title1 }}
+            </h1>
+        </div>
+
+        <!-- Mensajes de Error -->
+        {% if form.non_field_errors %}
+        <div class="max-w-4xl mx-auto mb-6" data-aos="fade-up">
+            <div class="bg-red-100 dark:bg-red-900/20 border border-red-400 text-red-700 dark:text-red-300 px-6 py-4 rounded-lg">
+                <div class="flex items-center mb-2">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span class="font-medium">Se encontraron errores en el formulario:</span>
+                </div>
+                <ul class="list-disc list-inside ml-7">
+                    {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Formulario Principal -->
+        <form method="post" class="max-w-6xl mx-auto">
+            {% csrf_token %}
+            
+            <!-- Card Principal -->
+            <div class="bg-white dark:bg-secundario rounded-lg shadow-lg overflow-hidden" data-aos="fade-up">
+                
+                <!-- Información del Pago -->
+                <div class="bg-blue-50 dark:bg-blue-900/20 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h2 class="text-xl font-semibold text-blue-800 dark:text-blue-300 flex items-center">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                        </svg>
+                        Información del Pago
+                    </h2>
+                </div>
+
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {% for field in form.visible_fields %}
+                        <div class="field-container {% if field.errors %}has-error{% endif %}">
+                            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                {{ field.label }}{% if field.field.required %}<span class="text-red-500 ml-1">*</span>{% endif %}
+                            </label>
+                            {{ field|add_class:"w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" }}
+                            {% for error in field.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div id="paypal-button-container" class="hidden mt-6"></div>
+
+                <!-- Detalles del Pago -->
+                <div class="bg-green-50 dark:bg-green-900/20 px-6 py-4 border-t border-b border-gray-200 dark:border-gray-700">
+                    <h2 class="text-xl font-semibold text-green-800 dark:text-green-300 flex items-center">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        Detalles del Pago
+                    </h2>
+                </div>
+
+                <div class="p-6">
+                    {{ formset.management_form }}
+                    
+                    <!-- Tabla Responsiva -->
+                    <div class="overflow-x-auto bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <table id="detalle-table" class="w-full">
+                            <thead class="bg-gray-100 dark:bg-gray-700">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Servicio</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Cantidad</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Precio Unit.</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Desc. %</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Seguro</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Valor Seg.</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Desc. Seg.</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                {% for form in formset %}
+                                <tr class="detalle-form hover:bg-gray-50 dark:hover:bg-gray-750">
+                                    {{ form.id }}
+                                    {% for field in form.visible_fields %}
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        {{ field|add_class:"w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" }}
+                                        {% for error in field.errors %}
+                                        <p class="text-red-500 text-xs mt-1">{{ error }}</p>
+                                        {% endfor %}
+                                    </td>
+                                    {% endfor %}
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <button type="button" class="remove-detalle bg-red-600 hover:bg-red-600 text-red px-3 py-1 rounded text-sm transition-colors shadow-md border border-red-700 ">
+                                            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
+                                            Eliminar
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Botón Agregar -->
+                    <div class="mt-4">
+                        <button type="button" id="add-detalle" class="bg-green-600 hover:bg-green-600 text-red px-4 py-2 rounded flex items-center transition-colors shadow-sm shadow-md border border-green-700">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Agregar Detalle
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="bg-gray-50 dark:bg-gray-800 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                    <div class="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-8">
+                        <button type="submit" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center transition-colors">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                            </svg>
+                            Guardar Pago
+                        </button>
+                        <a href="{{ back_url }}" class="w-full md:w-auto bg-red-700 hover:bg-red-800 text-white py-3 px-8 rounded-lg flex items-center justify-center transition-all duration-300 font-medium shadow-lg hover:shadow-xl">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            Cancelar
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+<!-- Modal de PayPal -->
+<div id="paypal-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-xl w-full max-w-md">
+        <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Completa el pago con PayPal</h2>
+        <div id="paypal-button-container-modal" class="mb-4"></div>
+        <button id="close-paypal-modal" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded">
+            Cancelar
+        </button>
+    </div>
+</div>
+</section>
+
+<!-- Script para inicializar PayPal -->
+<script src="https://www.paypal.com/sdk/js?client-id=AdzsRV0hF-GopW1EQrprsQ5taaG2h9x2HCUNMmcZ58XIZR7JrYxli_1DUcY8vLRbTM5kcpdXlzaJnVce&currency=USD"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const metodoPagoSelect = document.getElementById('id_metodo_pago');
+    const paypalModal = document.getElementById('paypal-modal');
+    const paypalContainer = document.getElementById('paypal-button-container-modal');
+    const closeBtn = document.getElementById('close-paypal-modal');
+
+    metodoPagoSelect.addEventListener('change', function () {
+        if (this.value === 'paypal') {
+            paypalModal.classList.remove('hidden');
+            if (!paypalContainer.hasChildNodes()) {
+                renderPaypalButton();
+            }
+        } else {
+            paypalModal.classList.add('hidden');
+        }
+    });
+
+    closeBtn.addEventListener('click', function () {
+    paypalModal.classList.add('hidden');
+    });
+
+
+
+    function renderPaypalButton() {
+        if (typeof paypal === 'undefined') {
+            console.error("PayPal SDK no está cargado.");
+            return;
+        }
+
+        paypal.Buttons({
+            createOrder: function(data, actions) {
+                const monto = document.getElementById('id_monto_total')?.value || '10.00';
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: monto
+                        }
+                    }]
+                });
+            },
+            onApprove: function(data, actions) {
+                return actions.order.capture().then(function(details) {
+                    alert('Pago completado por ' + details.payer.name.given_name);
+                    paypalModal.classList.add('hidden');
+
+                    // Crear input hidden para enviar el ID de la transacción
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'paypal_transaction_id';
+                    hiddenInput.value = details.id;
+                    document.querySelector('form').appendChild(hiddenInput);
+                });
+            }
+        }).render('#paypal-button-container-modal');
+    }
+});
+</script>
+
+
+<!-- Script para clonar/eliminar filas del formset -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const tableBody = document.querySelector("#detalle-table tbody");
+    const totalForms = document.getElementById("id_detalles-TOTAL_FORMS");
+
+    document.getElementById("add-detalle").addEventListener("click", function () {
+        const formCount = parseInt(totalForms.value);
+        const firstForm = tableBody.querySelector("tr.detalle-form");
+
+        if (!firstForm) return;
+
+        const newForm = firstForm.cloneNode(true);
+
+        // Limpiar errores anteriores
+        newForm.querySelectorAll("td").forEach(td => {
+            td.querySelectorAll("p.text-red-500, p.text-red-500.text-xs").forEach(p => p.remove());
+        });
+
+        // Renombrar inputs y limpiar valores
+        newForm.querySelectorAll("input, select, textarea").forEach(el => {
+            if (el.name) {
+                const isHiddenId = el.name.includes('-id');
+                const newName = el.name.replace(/-\d+-/, `-${formCount}-`);
+                const newId = el.id.replace(/-\d+-/, `-${formCount}-`);
+
+                el.name = newName;
+                el.id = newId;
+
+                // Solo limpia valores si no es el campo hidden ID
+                if (!isHiddenId) {
+                    if (el.type === "checkbox") {
+                        el.checked = false;
+                    } else {
+                        el.value = "";
+                    }
+                }
+
+                el.classList.remove("border-red-500");
+            }
+        });
+
+        tableBody.appendChild(newForm);
+        totalForms.value = formCount + 1;
+    });
+
+    tableBody.addEventListener("click", function (e) {
+        if (e.target.classList.contains("remove-detalle")) {
+            const row = e.target.closest("tr");
+            row.remove();
+            const rows = tableBody.querySelectorAll("tr.detalle-form");
+            totalForms.value = rows.length;
+            rows.forEach((tr, index) => {
+                tr.querySelectorAll("input, select, textarea").forEach(el => {
+                    if (el.name) {
+                        el.name = el.name.replace(/-\d+-/, `-${index}-`);
+                        el.id = el.id.replace(/-\d+-/, `-${index}-`);
+                    }
+                });
+            });
+        }
+    });
+});
+</script>
+
+{% endblock %}
